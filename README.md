@@ -2,7 +2,7 @@
 
 - [Parking Lot](#parking-lot)
 - [Tic Tac Toe](#tic-tac-toe)
-- [Library Management System](library-management-system)
+- [Library Management System](#library-management-system)
 
 # Parking Lot
 ```java
