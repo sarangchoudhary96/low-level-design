@@ -1,6 +1,7 @@
 # Table of Contents
 
 - [Parking Lot](#parking-lot)
+- [Tic Tac Toe](#tic-tac-toe)
 
 # Parking Lot
 ```java
@@ -212,6 +213,158 @@ public class Main {
 
         System.out.println(parkingLotStrategy.exitVehicle("KA 01 1235"));
         System.out.println(parkingLotStrategy.calculateParkingRate("KA 01 1235"));
+    }
+}
+```
+
+# Tic Tac Toe
+
+```java
+
+class Board {
+    private final char[][] board;
+
+    public Board(int size) {
+        this.board = new char[size][size];
+    }
+
+    public void initialize(int size) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                this.board[i][j] = '-';
+            }
+        }
+    }
+
+    public void updateCell(int row, int col, char symbol) {
+        this.board[row][col] = symbol;
+    }
+
+    public boolean isCellEmpty(int row, int col) {
+        return this.board[row][col] == '-';
+    }
+
+    public char getSymbol(int row, int col) {
+        return this.board[row][col];
+    }
+
+    public int[] getBoardDimensions() {
+        return new int[]{this.board.length, this.board[0].length};
+    }
+}
+
+// Player information
+class Player {
+    private final String name;
+    private final char symbol;
+
+    public Player(String name, char symbol) {
+        this.name = name;
+        this.symbol = symbol;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public char getSymbol() {
+        return symbol;
+    }
+}
+
+class Game {
+    private final Board board;
+    Player player1;
+    Player player2;
+
+    public Game(Player player1, Player player2, Board board) {
+        this.player1 = player1;
+        this.player2 = player2;
+        this.board = board;
+    }
+
+    public void startGame(int size) {
+        this.board.initialize(size);
+        System.out.println("Game started!");
+        System.out.println("Player 1: " + player1.getName() + " (" + player1.getSymbol() + ")");
+        System.out.println("Player 2: " + player2.getName() + " (" + player2.getSymbol() + ")");
+    }
+
+    public void playTurn(Player player, int row, int col) {
+        if(this.board.isCellEmpty(row, col)) {
+            this.board.updateCell(row, col, player.getSymbol());
+            boolean isDraw = this.checkDraw();
+            if(isDraw) {
+                System.out.println("It's a draw!");
+                return;
+            }
+            boolean isWinner = this.checkWinner(row, col, player);
+            if(isWinner) {
+                System.out.println(player.getName() + " wins!");
+            }
+        } else {
+            System.out.println("Cell is already occupied. Choose another cell.");
+        }
+    }
+
+    public boolean checkWinner(int row, int col, Player player) {
+        int[][] directions = {
+                {0, -1},{0, 1}, // horizontal(left, right)
+                {-1, 0},{1, 0}, // vertical(up, down)
+                {1, 1},{-1, -1}, // diagonally
+                {1, -1},{-1, 1} // diagonally
+        };
+        int n = this.board.getBoardDimensions()[0];
+        for(int[] dir: directions) {
+            int count = 1;
+            int r = dir[0];
+            int c = dir[1];
+
+            int newRow = row + r;
+            int newCol = col + c;
+            while(newRow >= 0 && newRow < n && newCol >= 0 && newCol < n && this.board.getSymbol(newRow, newCol) == player.getSymbol()) {
+                count++;
+                newRow += r;
+                newCol += c;
+            }
+
+            newRow = row - r;
+            newCol = col - c;
+            while(newRow >= 0 && newRow < n && newCol >= 0 && newCol < n && this.board.getSymbol(newRow, newCol) == player.getSymbol()) {
+                count++;
+                newRow -= r;
+                newCol -= c;
+            }
+            if(count == n) return true;
+        }
+
+        return false;
+    }
+
+    public boolean checkDraw() {
+        int n = this.board.getBoardDimensions()[0];
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (this.board.isCellEmpty(i, j)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        Player player1 = new Player("Jhon", 'X');
+        Player player2 = new Player("Alice", 'O');
+
+        Board board = new Board(3);
+
+        Game game = new Game(player1, player2, board);
+        game.startGame(3);
+
+        game.playTurn(player1, 1, 1);
     }
 }
 ```
