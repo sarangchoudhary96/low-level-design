@@ -220,12 +220,12 @@ public class Main {
 # Tic Tac Toe
 
 ```java
-
 class Board {
     private final char[][] board;
 
     public Board(int size) {
         this.board = new char[size][size];
+        this.initialize(size);
     }
 
     public void initialize(int size) {
@@ -276,6 +276,7 @@ class Game {
     private final Board board;
     Player player1;
     Player player2;
+    Player currentPlayer;
 
     public Game(Player player1, Player player2, Board board) {
         this.player1 = player1;
@@ -283,14 +284,12 @@ class Game {
         this.board = board;
     }
 
-    public void startGame(int size) {
-        this.board.initialize(size);
-        System.out.println("Game started!");
-        System.out.println("Player 1: " + player1.getName() + " (" + player1.getSymbol() + ")");
-        System.out.println("Player 2: " + player2.getName() + " (" + player2.getSymbol() + ")");
-    }
-
     public void playTurn(Player player, int row, int col) {
+        // Check if it's the player's turn
+        if(currentPlayer != null && currentPlayer != player) {
+            System.out.println(player.getName() + ", it's not your turn!");
+            return;
+        }
         if(this.board.isCellEmpty(row, col)) {
             this.board.updateCell(row, col, player.getSymbol());
             boolean isDraw = this.checkDraw();
@@ -302,9 +301,14 @@ class Game {
             if(isWinner) {
                 System.out.println(player.getName() + " wins!");
             }
+            switchPlayer(player);
         } else {
             System.out.println("Cell is already occupied. Choose another cell.");
         }
+    }
+
+    private void switchPlayer(Player lastPlayer) {
+        currentPlayer = lastPlayer == player1 ? player2 : player1;
     }
 
     public boolean checkWinner(int row, int col, Player player) {
@@ -356,15 +360,21 @@ class Game {
 
 class Main {
     public static void main(String[] args) {
+        int size = 3;
         Player player1 = new Player("Jhon", 'X');
         Player player2 = new Player("Alice", 'O');
 
-        Board board = new Board(3);
+        Board board = new Board(size);
 
         Game game = new Game(player1, player2, board);
-        game.startGame(3);
 
-        game.playTurn(player1, 1, 1);
+
+        // Simulate a few moves
+        game.playTurn(player1, 0, 0);
+        game.playTurn(player2, 1, 1);
+        game.playTurn(player1, 0, 1);
+        game.playTurn(player2, 2, 2);
+        game.playTurn(player1, 0, 2); // Jhon wins here
     }
 }
 ```
