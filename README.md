@@ -2,6 +2,7 @@
 
 - [Parking Lot](#parking-lot)
 - [Tic Tac Toe](#tic-tac-toe)
+- [Library Management System](library-management-system)
 
 # Parking Lot
 ```java
@@ -375,6 +376,123 @@ class Main {
         game.playTurn(player1, 0, 1);
         game.playTurn(player2, 2, 2);
         game.playTurn(player1, 0, 2); // Jhon wins here
+    }
+}
+```
+
+# Library Management System
+```java
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+class User {
+    Integer id;
+    String name;
+    String email;
+    String password;
+    String phone;
+    String address;
+    String role; // admin, user
+    String status; // active, inactive
+}
+
+class Book {
+    // tells about the book
+    Integer id;
+    String name;
+    String slug;
+    String location;
+    String author;
+    String category;
+    String genre;
+    Integer availableCount;
+}
+
+interface BookAction {
+    void execute(Integer id);
+}
+
+class BookIssue implements BookAction {
+    public void execute(Integer id) {
+        // logic to issue a book
+        System.out.println("Book with ID " + id + " issued.");
+    }
+}
+
+class BookReturn implements BookAction {
+    public void execute(Integer id) {
+        // logic to return a book
+        System.out.println("Book with ID " + id + " returned.");
+    }
+
+    public Integer calculatePenalty(Penalty penalty) {
+        return penalty.calculatePenalty(this);
+    }
+}
+
+class BookManager {
+    BookAction bookAction;
+    Map<Integer, List<Book>> userBookMap = new HashMap<>();
+
+    public BookManager(BookAction bookAction) {
+        this.bookAction = bookAction;
+    }
+
+    public void issueBook(Integer id) {
+        this.bookAction.execute(id);
+    }
+
+    public void returnBook(Integer id) {
+        this.bookAction.execute(id);
+    }
+
+    public Integer calculatePenalty(Penalty penalty) {
+        if (this.bookAction instanceof BookReturn) {
+            return ((BookReturn) this.bookAction).calculatePenalty(penalty);
+        }
+        return 0; // No penalty if not a return action
+    }
+}
+
+interface Penalty {
+    Integer calculatePenalty(BookReturn bookReturn);
+}
+
+class BookReturnPenalty implements Penalty {
+    public Integer calculatePenalty(BookReturn bookReturn) {
+        // logic to calculate penalty
+        return 50; // Example penalty
+    }
+}
+
+class Main {
+    public static void main(String[] args) {
+        // Issue book
+        BookAction issueAction = new BookIssue();
+        BookManager manager = new BookManager(issueAction);
+
+        Book book = new Book();
+        book.id = 1;
+        book.name = "Java Programming";
+        book.slug = "java-programming";
+        book.location = "Library A";
+        book.author = "John Doe";
+        book.category = "Programming";
+        book.genre = "Technology";
+        book.availableCount = 5;
+
+        manager.issueBook(book.id);
+
+        // Return book
+        BookAction returnAction = new BookReturn();
+        manager.bookAction = returnAction;
+        manager.returnBook(book.id);
+
+        // Calculate penalty
+        Penalty penalty = new BookReturnPenalty();
+        Integer penaltyAmount = manager.calculatePenalty(penalty);
+        System.out.println("Penalty: " + penaltyAmount);
     }
 }
 ```
