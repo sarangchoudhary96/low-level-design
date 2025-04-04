@@ -505,7 +505,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 interface FileSystem {
-    void ls();
+    void ls(String indent);
 }
 
 class File implements FileSystem {
@@ -516,8 +516,8 @@ class File implements FileSystem {
     }
 
     @Override
-    public void ls() {
-        System.out.println("File Name is " + this.fileName);
+    public void ls(String indent) {
+        System.out.println(indent + "File: " + this.fileName);
     }
 }
 
@@ -535,13 +535,10 @@ class Directory implements FileSystem {
     }
 
     @Override
-    public void ls() {
-        for(FileSystem fileName: fileSystems) {
-            if(fileName instanceof Directory) {
-                System.out.println("directory is " + ((Directory) fileName).directoryName);
-                return;
-            }
-            fileName.ls();
+    public void ls(String indent) {
+        System.out.println(indent + "directory: " + this.directoryName);
+        for(FileSystem fs: fileSystems) {
+            fs.ls(indent + "    ");
         }
     }
 }
@@ -566,7 +563,7 @@ public class Main {
 
         directory1.add(directory2);
 
-        directory1.ls();
+        directory1.ls("");
 
     }
 }
