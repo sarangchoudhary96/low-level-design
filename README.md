@@ -3,6 +3,7 @@
 - [Parking Lot](#parking-lot)
 - [Tic Tac Toe](#tic-tac-toe)
 - [Library Management System](#library-management-system)
+- [File System using composite pattern](#file-system-using-composite-pattern)
 
 # Parking Lot
 ```java
@@ -493,6 +494,80 @@ class Main {
         Penalty penalty = new BookReturnPenalty();
         Integer penaltyAmount = manager.calculatePenalty(penalty);
         System.out.println("Penalty: " + penaltyAmount);
+    }
+}
+```
+
+
+# File System using composite pattern
+```java
+import java.util.ArrayList;
+import java.util.List;
+
+interface FileSystem {
+    void ls();
+}
+
+class File implements FileSystem {
+    String fileName;
+
+    public File(String fileName) {
+        this.fileName = fileName;
+    }
+
+    @Override
+    public void ls() {
+        System.out.println("File Name is " + this.fileName);
+    }
+}
+
+class Directory implements FileSystem {
+    List<FileSystem> fileSystems;
+    String directoryName;
+
+    public Directory(String directoryName) {
+        this.fileSystems = new ArrayList<>();
+        this.directoryName = directoryName;
+    }
+
+    public void add(FileSystem file) {
+        this.fileSystems.add(file);
+    }
+
+    @Override
+    public void ls() {
+        for(FileSystem fileName: fileSystems) {
+            if(fileName instanceof Directory) {
+                System.out.println("directory is " + ((Directory) fileName).directoryName);
+                return;
+            }
+            fileName.ls();
+        }
+    }
+}
+
+
+public class Main {
+    public static void main(String[] args) {
+
+        Directory directory1 = new Directory("D1");
+        FileSystem file1 = new File("index.ts");
+        FileSystem file2 = new File("server.ts");
+
+        directory1.add(file1);
+        directory1.add(file2);
+
+        Directory directory2 = new Directory("D2");
+        FileSystem file3 = new File("comm.ts");
+        FileSystem file4 = new File("cron.ts");
+
+        directory2.add(file3);
+        directory2.add(file4);
+
+        directory1.add(directory2);
+
+        directory1.ls();
+
     }
 }
 ```
