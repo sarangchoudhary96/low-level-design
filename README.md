@@ -294,14 +294,14 @@ class Game {
         }
         if(this.board.isCellEmpty(row, col)) {
             this.board.updateCell(row, col, player.getSymbol());
+            boolean isWinner = this.checkWinner(row, col, player);
+            if(isWinner) {
+                System.out.println(player.getName() + " wins!");
+            }
             boolean isDraw = this.checkDraw();
             if(isDraw) {
                 System.out.println("It's a draw!");
                 return;
-            }
-            boolean isWinner = this.checkWinner(row, col, player);
-            if(isWinner) {
-                System.out.println(player.getName() + " wins!");
             }
             switchPlayer(player);
         } else {
@@ -314,11 +314,17 @@ class Game {
     }
 
     public boolean checkWinner(int row, int col, Player player) {
-        int[][] directions = {
-                {0, -1},{0, 1}, // horizontal(left, right)
-                {-1, 0},{1, 0}, // vertical(up, down)
-                {1, 1},{-1, -1}, // diagonally
-                {1, -1},{-1, 1} // diagonally
+         int[][] directions = {
+//                {0, -1},{0, 1}, // horizontal(left, right)
+//                {-1, 0},{1, 0}, // vertical(up, down)
+//                {1, 1},{-1, -1}, // diagonally
+//                {1, -1},{-1, 1} // diagonally
+//        };
+        int[][] directionPairs = {
+            {0, 1},    // horizontal (right & left)
+            {1, 0},    // vertical (down & up)
+            {1, 1},    // diagonal \
+            {1, -1}    // diagonal /
         };
         int n = this.board.getBoardDimensions()[0];
         for(int[] dir: directions) {
