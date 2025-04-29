@@ -2,6 +2,7 @@
 
 - [Parking Lot](#parking-lot)
 - [Tic Tac Toe](#tic-tac-toe)
+- [Snake and Ladder](#snake-and-ladder)
 - [Library Management System](#library-management-system)
 - [File System using composite pattern](#file-system-using-composite-pattern)
 
@@ -383,6 +384,165 @@ class Main {
         game.playTurn(player1, 0, 1);
         game.playTurn(player2, 2, 2);
         game.playTurn(player1, 0, 2); // Jhon wins here
+    }
+}
+```
+
+# Snake and Ladder
+
+```java
+import java.util.*;
+
+class Player {
+    private int position;
+    private final String playerName;
+    private int finalPosition;
+
+    public Player(String playerName, int position) {
+        this.playerName = playerName;
+        this.position = position;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
+
+    public int getFinalPosition() {
+        return finalPosition;
+    }
+
+    public void setFinalPosition(int position) {
+        this.finalPosition = position;
+    }
+
+    public String getPlayerName() {
+        return this.playerName;
+    }
+}
+
+interface Dice {
+    int roll();
+}
+
+class NormalDice implements Dice {
+    @Override
+    public int roll() {
+        return (int) (Math.random() * 6) + 1;
+    }
+}
+
+class Board {
+    private final Map<Integer, Cells> cellsMap;
+
+    public Board(Map<Integer, Cells> cellsMap) {
+        this.cellsMap = cellsMap;
+    }
+
+    public Cells getNextCell(int position) {
+        return cellsMap.getOrDefault(position, new Cells(position, false, false, position));
+    }
+}
+
+class Cells {
+    final int position;
+    final boolean isLadder;
+    final boolean isSnake;
+    final int jumpTo;
+
+
+    public Cells(int position, boolean isLadder, boolean isSnake, int jumpTo) {
+        this.position = position;
+        this.isLadder = isLadder;
+        this.isSnake = isSnake;
+        this.jumpTo = jumpTo;
+    }
+}
+
+class Game {
+    Board board;
+    Queue<Player> playerQueue;
+    Dice dice = new NormalDice();
+    int currentPosition = 1;
+
+    public Game(Board board, Queue<Player> player) {
+        this.board = board;
+        this.playerQueue = player;
+    }
+
+    public void addPlayer(Player player) {
+        playerQueue.add(player);
+    }
+
+    public boolean play() {
+        if(playerQueue.size() == 1) {
+            Player currentPlayer = playerQueue.poll();
+            currentPlayer.setFinalPosition(this.currentPosition++);
+            return false;
+        }
+        Player currentPlayer = playerQueue.poll();
+        int score = dice.roll();
+        int newPosition = currentPlayer.getPosition() + score;
+        if(newPosition > 100){
+            newPosition = currentPlayer.getPosition();
+        }
+        Cells cell = board.getNextCell(newPosition);
+        newPosition = cell.isLadder || cell.isSnake ? cell.jumpTo : newPosition;
+        currentPlayer.setPosition(newPosition);
+
+        System.out.println(currentPlayer.getPlayerName() + " rolled a " + score + " and moved to " + newPosition);
+
+        if (isWinner(currentPlayer)) {
+            currentPlayer.setFinalPosition(this.currentPosition++);
+            return true;
+        }
+        updateStatus(currentPlayer);
+        return true;
+    }
+
+    private boolean isWinner(Player player) {
+        return player.getPosition() >= 100;
+    }
+
+    public void updateStatus(Player player) {
+        playerQueue.add(player);
+    }
+}
+
+// client Code
+public class Main {
+    public static void main(String[] args) {
+        Player player1 = new Player("Sarang", 0);
+        Player player2 = new Player("Jayesh", 0);
+        Player player3 = new Player("Suresh", 0);
+
+        Queue<Player> players = new LinkedList<>();
+        players.add(player1);
+        players.add(player2);
+        players.add(player3);
+
+
+        Map<Integer, Cells> cellsMap = new HashMap<>();
+        cellsMap.put(2, new Cells(2, true, false, 23));  // ladder
+        cellsMap.put(25, new Cells(25, false, true, 5)); // snake
+        // Add more as needed...
+
+        Board board = new Board(cellsMap);
+        Game game = new Game(board, players);
+        while (game.play()) {
+            try {
+                Thread.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        System.out.println(player1.getPlayerName() + " :: position :" + player1.getFinalPosition());
+        System.out.println(player2.getPlayerName() + " :: position :" + player2.getFinalPosition());
+        System.out.println(player3.getPlayerName() + " :: position :" + player3.getFinalPosition());
     }
 }
 ```
